@@ -31,6 +31,15 @@ class FiltroListServiceView(generics.ListCreateAPIView):
 	serializer_class = serializers.FiltroSerializer
 
 
+class CestaListServiceView(generics.ListCreateAPIView):
+	queryset = models.Cesta.objects.all()
+	serializer_class = serializers.CestaSerializer
+
+class ItemCestaListServiceView(generics.ListCreateAPIView):
+	queryset = models.ItemCesta.objects.all()
+	serializer_class = serializers.ItemCestaSerializer
+
+
 
 #Post
 class CadastrarEstabelecimentoServiceView(APIView):
@@ -81,6 +90,42 @@ class CadastrarFiltroServiceView(APIView):
 
 		serializer = serializers.UnidadeSerializer(filtro)
 		return Response(serializer.data)
+
+
+class CadastrarCestaServiceView(APIView):
+
+	def post(self,request,format=None):
+
+		descricao = request.data.get('descricao')
+		estabelecimento = request.data.get('estabelecimento')
+		
+		cesta = models.Cesta.objects.create(descricao = descricao,estabelecimento = estabelecimento)
+
+		serializer = serializers.CestaSerializer(cesta)
+		return Response(serializer.data)
+
+
+
+class CadastrarItemServiceView(APIView):
+
+	def post(self,request,format=None):
+
+		marca = request.data.get('marca')
+		unidade = request.data.get('unidade')
+		filtro = request.data.get('filtro')
+		valor = request.data.get('valor')
+		cesta_id= request.data.get('cesta_id')
+		
+		
+		item = models.ItemCesta.objects.create(marca = marca,
+											unidade = unidade, 
+											filtro = filtro, 
+											valor = valor, 
+											cesta_id = cesta_id)
+
+		serializer = serializers.ItemCestaSerializer(item)
+		return Response(serializer.data)
+
 
 
 #Update
@@ -140,6 +185,36 @@ class AtualizarFiltroServiceView(APIView):
 
 
 
+class AtualizarCestaServiceView(APIView):
+
+	def post(self,request,format=None):
+
+		cesta = models.Cesta.objects.get(id=request.data.get('id'))
+		cesta.descricao = request.data.get('descricao')
+		cesta.estabelecimento = request.data.get('estabelecimento')
+
+		cesta.save()
+
+		serializer = serializers.CestaSerializer(cesta)
+		return Response(serializer.data)
+
+
+
+class AtualizarItemServiceView(APIView):
+
+	def post(self,request,format=None):
+
+		item = models.ItemCesta.objects.get(id=request.data.get('id'))
+		item.marca = request.data.get('marca')
+		item.unidade = request.data.get('unidade')
+		item.filtro = request.data.get('filtro')
+		item.valor = request.data.get('valor')
+
+		item.save()
+
+		serializer = serializers.ItemCestaSerializer(item)
+		return Response(serializer.data)
+
 #Exclusão
 class ExcluirEstabelecimentoServiceView(APIView):
 
@@ -190,3 +265,30 @@ class ExcluirFiltroServiceView(APIView):
 
 		serializer = serializers.FiltroSerializer(filtro)
 		return Response(serializer.data)
+
+
+
+class ExcluirCestaServiceView(APIView):
+
+	def post(self,request,format=None):
+
+		cesta = models.Cesta.objects.get(id=request.data.get('id'))
+
+		cesta.delete()
+
+		serializer = serializers.CestaSerializer(cesta)
+		return Response(serializer.data)
+
+
+
+class ExcluirItemServiceView(APIView):
+
+	def post(self,request,format=None):
+
+		item = models.ItemCesta.objects.get(id=request.data.get('id'))
+
+		item.delete()
+
+		serializer = serializers.ItemCestaSerializer(item)
+		return Response(serializer.data)
+
